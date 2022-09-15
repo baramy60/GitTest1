@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PdsSp">
+
+     <resultMap id="PdsMap"
+        type="com.green.pdssp.vo.PdsVo">
+     <result property="idx"       column="IDX"       javaType="int" />
+     <result property="menu_id"   column="MENU_ID"   javaType="string" />
+     <result property="title"     column="TITLE"     javaType="string" />
+     <result property="cont"      column="CONT"      javaType="string" />
+     <result property="writer"    column="WRITER"    javaType="string" />
+     <result property="regdate"   column="REGDATE"   javaType="string" />
+     <result property="readcount" column="READCOUNT" javaType="int" />
+    
+     <result property="bnum"      column="BNUM"      javaType="int" />
+     <result property="lvl"       column="LVL"       javaType="int" />
+     <result property="step"      column="STEP"      javaType="int" />
+     <result property="nref"      column="NREF"      javaType="int" />
+     
+     <result property="delnum"      column="DELNUM"       javaType="int" />
+     <result property="filescount"  column="FILESCOUNT"   javaType="int" />
+   </resultMap>
+   
+    <!-- fileList -->
+    <resultMap id  = "FileListMap"
+              type = "com.green.pdssp.vo.FilesVo"  >
+        <result property="file_num"    column="FILE_NUM"     javaType="int" />      
+        <result property="idx"         column="IDX"          javaType="int" />      
+        <result property="filename"    column="FILENAME"     javaType="String" />      
+        <result property="fileext"     column="FILEEXT"      javaType="String" />      
+        <result property="sfilename"   column="SFILENAME"     javaType="String" />      
+    </resultMap>
+
+    <select  id             = "PdsPagingList"
+             statementType  = "CALLABLE"
+             parameterType  = "hashmap"
+             resultType     = "com.green.pdssp.vo.PdsVo" >
+             
+    { CALL  PKG_PDS.PROC_PDS_PAGINGLIST(
+       #{menu_id,    mode=IN,  jdbcType=VARCHAR },
+       #{nowpage,    mode=IN,  jdbcType=INTEGER },
+       #{pagecount,  mode=IN,  jdbcType=INTEGER },
+       #{totalcount, mode=OUT, jdbcType=INTEGER },
+       #{result,     mode=OUT, jdbcType=CURSOR,
+           javaType=ResultSet, resultMap = PdsMap}
+    ) }    
+    
+    </select>
+    
+    <!--  새글쓰기, 답글 쓰기 -->
+     <insert id            = "PdsWrite"
+           statementType = "CALLABLE"
+           parameterType = "hashmap" >
+      {CALL  PKG_PDS.PROC_PDS_INSERT(
+        #{menu_id,     mode=IN,   jdbcType=VARCHAR }, 
+        #{title,       mode=IN,   jdbcType=VARCHAR }, 
+        #{cont,        mode=IN,   jdbcType=VARCHAR }, 
+        #{writer,      mode=IN,   jdbcType=VARCHAR }, 
+        #{bnum,        mode=IN,   jdbcType=INTEGER }, 
+        #{lvl,         mode=IN,   jdbcType=INTEGER }, 
+        #{step,        mode=IN,   jdbcType=INTEGER }, 
+        #{nref,        mode=IN,   jdbcType=INTEGER },
+        
+        #{filenames,   mode=IN,   jdbcType=Object,
+          jdbcType    = ARRAY, jdbcTypeName = FILE_ARRAY,
+          typeHandler = com.green.pdssp.service.typehandler.ListMapTypeHanlder 
+         },
+        #{fileexts,    mode=IN,   jdbcType=Object,
+          jdbcType    = ARRAY, jdbcTypeName= FILE_ARRAY,
+          typeHandler = com.green.pdssp.service.typehandler.ListMapTypeHanlder 
+         },
+        #{sfilenames,  mode=IN,   jdbcType=Object,
+          jdbcType    = ARRAY, jdbcTypeName= FILE_ARRAY,
+          typeHandler = com.green.pdssp.service.typehandler.ListMapTypeHanlder 
+         }        
+         
+      ) }     
+      
+   </insert>
+    
+    <select   id="PdsView"
+              statementType="CALLABLE"
+              parameterType="hashmap"
+              resultType="com.green.pdssp.vo.PdsVo">
+       { CALL  PKG_PDS.PROC_PDS_VIEW(
+           #{ idx,     mode=IN,  jdbcType=INTEGER },
+           #{ result,  mode=OUT, jdbcType=CURSOR,
+              javaType  = ResultSet,
+              resultMap = PdsMap }          
+       ) }
+    
+    </select>
+    
+    <select    id="FileList"
+               statementType="CALLABLE" 
+               parameterType="hashmap"
+               resultType="com.green.pdssp.vo.FilesVo" >
+        {CALL  PKG_PDS.PROC_PDS_FILELIST(
+	        #{ idx,     mode=IN,   jdbcType=INTEGER },
+	        #{ result,  mode=OUT,  jdbcType=CURSOR,
+	           javaType = ResultSet,
+	           resultMap = FileListMap }   
+        )}
+    
+    </select>
+    
+  
+</mapper>
+
+
+
+
+
+
+
+

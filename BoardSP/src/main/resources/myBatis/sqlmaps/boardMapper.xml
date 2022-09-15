@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Board">
+
+	<!--  목록 조회 -->
+    <select id="BoardList"
+      resultType="com.green.board.vo.BoardVo">
+      
+      SELECT
+	    IDX,
+	    MENU_ID,
+	    
+	  --  LPAD(' ', LVL*2 ) || DECODE( LVL, 0, '', '[Re] ' ) || TITLE  AS TITLE, 
+	    DECODE( LVL, 0, '', '[Re] ' ) || TITLE  AS TITLE, 
+	    
+	    WRITER,
+	    TO_CHAR(REGDATE, 'YYYY-MM-DD')  REGDATE,
+	    READCOUNT,
+	    BNUM,
+	    LVL,
+	    STEP,
+	    NREF
+	 FROM
+	    BOARD
+	 
+	 <if test="menu_id != null and menu_id != ''">
+       WHERE  
+        MENU_ID = #{menu_id}
+     </if>
+	 
+	 ORDER  BY  NREF  DESC,  STEP  ASC          
+      
+    </select>
+    
+    <update id="ReadCountUpdate">
+       UPDATE  BOARD
+        SET    READCOUNT = READCOUNT + 1     
+        WHERE  IDX  = #{idx}        
+    </update>
+    
+    <!-- 내용 보기 -->
+    <select id            = "Board"
+            parameterType = "hashmap"
+            resultType    = "com.green.board.vo.BoardVo">
+      SELECT
+	    IDX,
+	    MENU_ID,
+	    TITLE,
+	    NVL(CONT, ' ') CONT,
+	    WRITER,
+	    TO_CHAR(REGDATE, 'YYYY-MM-DD')  REGDATE,
+	    READCOUNT,
+	    BNUM,
+	    LVL,
+	    STEP,
+	    NREF
+	 FROM
+	    BOARD
+     WHERE
+        IDX   = #{ idx }
+    </select>
+    
+    <!--  새글 쓰기 -->
+    <insert  id="BoardInsert" >
+    INSERT INTO BOARD (
+	    IDX,
+	    MENU_ID,
+	    TITLE,
+	    CONT,
+	    WRITER,
+	    REGDATE,
+	    READCOUNT,
+	    BNUM,
+	    LVL,
+	    STEP,
+	    NREF
+	) VALUES (
+	    ( SELECT NVL(MAX(IDX),0)+1 FROM BOARD ) ,
+	    #{menu_id},
+	    #{title},
+	    #{cont},
+	    #{writer},
+	    SYSDATE,
+	    0,
+	--    ( SELECT NVL(MAX(BNUM),0)+1 FROM BOARD WHERE MENU_ID= ${menu_id} ) ,
+	    ( SELECT NVL(MAX(IDX),0)+1 FROM BOARD  ) ,
+	    0,
+	    0,
+	    ( SELECT NVL(MAX(IDX),0)+1 FROM BOARD ) 
+	)    
+    </insert>
+    
+    <!-- 해당글(menu_id) 그룹(nref)의 기존 답글의 순서(step)를 +1 증가 -->
+    <update id="UpdateRef">
+     UPDATE  BOARD
+	     SET    STEP = STEP + 1
+	     WHERE  MENU_ID = #{ menu_id } 
+	     AND    NREF    = #{ nref }
+	     AND    STEP    > #{ step }
+    </update>
+    
+    <!-- 답글 쓰기 -->
+    <insert id="BoardReply">       
+    INSERT INTO BOARD (
+	    IDX,
+	    MENU_ID,
+	    TITLE,
+	    CONT,
+	    WRITER,
+	    REGDATE,
+	    READCOUNT,
+	    BNUM,
+	    LVL,
+	    STEP,
+	    NREF
+	) VALUES (
+	    ( SELECT NVL(MAX(IDX),0)+1 FROM BOARD ) ,
+	    #{menu_id},
+	    #{title},
+	    #{cont},
+	    #{writer},
+	    SYSDATE,
+	    0,
+	    #{ bnum  },
+	    #{ lvl   } + 1 ,
+	    #{ step  } + 1,
+	    #{ nref  } 
+	)
+    </insert>
+    
+   <!-- 수정하기 -->
+   <update id="BoardUpdate">
+      UPDATE   BOARD
+       SET     TITLE = #{ title },
+               CONT  = #{ cont  }
+       WHERE   IDX   = #{ idx   }         
+   </update>
+   
+   <!-- 삭제하기 -->
+   <delete id="BoardDelete">
+      DELETE  FROM  BOARD
+       WHERE  IDX  =  #{ idx } 
+   </delete>
+      
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
+<style>
+
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   $(  function() {
+	   $('#btnOk').on('click', function() {
+		   alert('btnOk click:' +  $('#v').val() );
+		   
+		   $.ajax({
+			   url         :  '/ajax2',
+			   data        :   {v : $('#v').val() },
+			   method      :  'POST'			   			   
+		   })
+		   .done(function(json, textStatus, xhr ) {
+			   console.log(json);
+			   alert( JSON.stringify(json) );
+			   let   html  = '<ul>';
+			   html       += '<li>아이디:' + json.id     +'</li>';
+			   html       += '<li>암호:'   + json.pass   +'</li>';
+			   html       += '<li>v:'      + json.v      +'</li>';
+			   html       += '</ul>';
+			   $('#div1').append(html);
+		   })
+		   .fail(function(error, textStatus, errorThrown) {
+			   console.log(error);
+			   alert('Error:' + error);
+		   });
+	   })
+   });
+</script>
+</head>
+<body>
+   <h2>이것은 html</h2>
+   <input type="text" id="v" />
+   <button  id="btnOk">Ok</button>
+   <div id="div1"></div>
+</body>`
+</html>
+
+
+
+

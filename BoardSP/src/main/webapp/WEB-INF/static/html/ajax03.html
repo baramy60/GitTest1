@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
+<link rel="stylesheet" href="/css/common.css" />
+<style>
+   table { margin-top: 30px; }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   // header
+   function  header() {
+	   let head  = '<tr>';
+	   head     += '<th>아이디</th>';
+	   head     += '<th>이름</th>';
+	   head     += '<th>가입일</th>';
+	   head     += '</tr>';
+	   return head;
+   }
+   
+   // getUserAll
+   function  getUserAll() {
+	   let url  = '/Board';
+	   let html = '';
+	   $.getJSON(url, function( datalist ) {		   
+		   alert( JSON.stringify(datalist) );
+		   html += '<table>';
+		   html += header();
+		   datalist.forEach(function( user, index ) {
+			   html += '<tr>';				   
+			   html += '<td>' + user.userid    + '</td>';				   
+			   html += '<td>' + user.username  + '</td>';				   
+			   html += '<td>' + user.indate    + '</td>';				   
+			   html += '</tr>';				   
+		   })
+		   html += '</table>';
+		   alert(html);
+		   $('#div1').html( html );
+	   } )
+   }
+
+   // getUserByName()
+   function getUserByName() {
+	   let  url = '/Board/name/' + $('#text').val() ;
+	   $.get(url, function( datalist ) {
+		   let html = '<table>';
+		   html += header();
+		   datalist.forEach( function( user ) {
+			   html += '<tr>';				   
+			   html += '<td>' + user.userid    + '</td>';				   
+			   html += '<td>' + user.username  + '</td>';				   
+			   html += '<td>' + user.indate    + '</td>';				   
+			   html += '</tr>';		
+		   });		   
+		   html += '</table>';
+		   $('#div1').html(html);
+	   }) 
+   }
+   
+   // getUserById()
+   function getUserById() {
+	   $.ajax({
+		   url    : '/Board/' + $('#text').val() ,
+		   method : 'GET' 	   
+	   })
+	   .done( function( user ) {
+		   alert(JSON.stringify(user) )
+		   let html ='';
+		   html += '<table>';
+	       html += '<tr>';				   
+		   html += '  <td>아이디</td>';				   
+		   html += '  <td>' + user.userid    + '</td>';				   
+		   html += '</tr>';				   
+	       html += '<tr>';				   
+		   html += '  <td>암호</td>';				   
+		   html += '  <td>' + user.passwd  + '</td>';				   
+		   html += '</tr>';				   
+	       html += '<tr>';				   
+		   html += '  <td>사용자 이름</td>';				   
+		   html += '  <td>' + user.username  + '</td>';				   
+		   html += '</tr>';				   
+	       html += '<tr>';				   
+		   html += '  <td>가입일</td>';				   
+		   html += '  <td>' + user.indate    + '</td>';				   
+		   html += '</tr>';				   
+		   html += '</table>';
+		   alert(html);
+		   $('#div1').html( html );
+	   })
+	   .fail( function(error) {
+		   console.log( error );
+		   alert( 'error:' + error );
+	   })
+   }
+      
+   //$()
+   $(  function() {
+	   $('#btnFind').on('click', function() {
+		   const  search = $('#search > option:selected').val();
+		   alert( search );
+		   switch (search) {
+		   case 'all': 
+			   getUserAll();
+			   break;
+		   case 'name': 
+			   getUserByName();
+			   break;
+		   case 'id': 
+			   getUserById();
+			   break;
+		   }
+		   
+	   })
+   });
+</script>
+</head>
+<body>
+ <div id="main">
+   <h2>회원정보조회</h2>
+   <select  id="search">
+     <option value="all">전체</option>
+     <option value="name">이름</option>
+     <option value="id">아이디</option>
+   </select>
+   <input type="text" id="text" palceholder="검색어" />
+   <button id="btnFind">조회</button>
+   <div id="div1"></div>
+ </div>  
+</body>`
+</html>
+
+
+
+
+
+
+
+
+
+
+

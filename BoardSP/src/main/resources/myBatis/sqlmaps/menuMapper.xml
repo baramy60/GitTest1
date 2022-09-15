@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Menu">
+  
+    <select id="MenuList"
+      resultType="com.green.menus.vo.MenuVo">
+      SELECT     MENU_ID,  MENU_NAME,  MENU_SEQ
+       FROM      MENUS
+       ORDER BY  MENU_SEQ  ASC
+    </select>
+    
+    <insert id="MenuInsert"
+            parameterType="com.green.menus.vo.MenuVo">
+      INSERT  INTO  MENUS ( MENU_ID, MENU_NAME, MENU_SEQ )
+        VALUES (  #{menu_id}, #{menu_name}, #{menu_seq}   )
+    </insert>
+      
+    <!--
+     MyBatis 3.2.6 부터 쓸 수 있는 multiple select key 를 활용 
+    keyProperty="menu_id,menu_seq" 공백있으면 안됨 
+     resultType="hashmap" 사용하면안됨 =>  resultType="com.green.menu.vo.MenuVo" 
+   -->
+    <insert id="MenuInsert2" >
+      <selectKey keyProperty="menu_id,menu_seq"
+         resultType="com.green.menus.vo.MenuVo" order="BEFORE" >
+         SELECT menu_id,menu_seq
+			 FROM
+			( SELECT  'MENU' ||
+			   TRIM( TO_CHAR( SUBSTR( NVL( MAX(MENU_ID), 'MENU00'), 5, 2 ) +1, '00')  )  AS MENU_ID
+			  FROM MENUS) menu_id, 			
+			(SELECT   NVL( MAX(MENU_SEQ), 0 ) + 1 as menu_seq
+			  FROM   MENUS) menu_seq
+      </selectKey>           
+      INSERT  INTO  MENUS ( MENU_ID, MENU_NAME, MENU_SEQ )
+        VALUES (  #{menu_id}, #{menu_name}, #{menu_seq}   )
+    </insert>
+    
+    <delete  id="DeleteMenu">
+      DELETE  FROM  MENUS
+       WHERE  MENU_ID  = #{menu_id}
+    </delete>
+    
+    <select  id="MenuView"
+       resultType="com.green.menus.vo.MenuVo" >
+      SELECT  MENU_ID, MENU_NAME, MENU_SEQ
+       FROM   MENUS
+       WHERE  MENU_ID  = #{menu_id}    
+    </select>
+    
+    <update id="MenuUpdate">
+      UPDATE  MENUS
+       SET    MENU_NAME = #{ menu_name },
+              MENU_SEQ  = #{ menu_seq  }
+       WHERE  MENU_ID   = #{ menu_id   }        
+    </update>
+         
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

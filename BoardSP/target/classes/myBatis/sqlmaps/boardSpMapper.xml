@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoardSp">
+
+     <resultMap id="BoardMap"
+      type="com.green.boardsp.vo.BoardVo">
+     <result property="idx"       column="IDX"       javaType="int" />
+     <result property="menu_id"   column="MENU_ID"   javaType="string" />
+     <result property="title"     column="TITLE"     javaType="string" />
+     <result property="cont"      column="CONT"      javaType="string" />
+     <result property="writer"    column="WRITER"    javaType="string" />
+     <result property="regdate"   column="REGDATE"   javaType="string" />
+     <result property="readcount" column="READCOUNT" javaType="int" />
+     <result property="bnum"      column="BNUM"      javaType="int" />
+     <result property="lvl"       column="LVL"       javaType="int" />
+     <result property="step"      column="STEP"      javaType="int" />
+     <result property="nref"      column="NREF"      javaType="int" />
+   </resultMap>
+
+    <select  id             = "BoardList"
+             statementType  = "CALLABLE"
+             parameterType  = "hashmap"
+             resultType     = "com.green.boardsp.vo.BoardVo" >
+             
+    { CALL  PKG_BOARD.PROC_BOARD_LIST(
+       #{menu_id, mode=IN,  jdbcType=VARCHAR, javaType=string },
+       #{result,  mode=OUT, jdbcType=CURSOR,
+           javaType=ResultSet, resultMap = BoardMap}
+    ) }    
+    
+    </select>
+    
+    <select id             = "BoardView"
+            statementType  = "CALLABLE"
+            parameterType  = "hashmap"
+            resultType     = "com.green.boardsp.vo.BoardVo">
+     { CALL  PKG_BOARD.PROC_BOARD_VIEW(
+	       #{idx,     mode=IN,  jdbcType=INTEGER },     
+           #{result,  mode=OUT, jdbcType=CURSOR,
+               javaType=ResultSet, resultMap = BoardMap
+           }
+     ) }
+    </select>
+    
+    <update id="UpdateBoard"
+            statementType="CALLABLE"
+            parameterType="hashmap">
+      {CALL  PKG_BOARD.PROC_BOARD_UPDATE(
+          #{idx,       mode=IN,  jdbcType=INTEGER },   
+          #{title,     mode=IN,  jdbcType=VARCHAR },   
+          #{cont,      mode=IN,  jdbcType=VARCHAR }   
+      )}
+    
+    </update>
+    
+    <delete   id="DeleteBoard"
+             statementType="CALLABLE"
+             parameterType="hashmap" >
+       {CALL PKG_BOARD.PROC_BOARD_DELETE( 
+           #{idx,    mode=IN,  jdbcType=INTEGER }
+       ) }   
+    
+    </delete>
+    
+    <insert id            = "InsertBoard"
+            statementType = "CALLABLE"
+            parameterType = "hashmap" >
+       { CALL  PKG_BOARD.PROC_BOARD_INSERT(
+          #{menu_id,  mode=IN,  jdbcType=VARCHAR,  javaType=string },  
+          #{bnum,     mode=IN,  jdbcType=INTEGER,  javaType=int    },  
+          #{lvl,      mode=IN,  jdbcType=INTEGER,  javaType=int    },  
+          #{step,     mode=IN,  jdbcType=INTEGER,  javaType=int   },  
+          #{nref,     mode=IN,  jdbcType=INTEGER,  javaType=int    },  
+          #{title,    mode=IN,  jdbcType=VARCHAR,  javaType=string },  
+          #{cont,     mode=IN,  jdbcType=VARCHAR,  javaType=string },  
+          #{writer,   mode=IN,  jdbcType=VARCHAR,  javaType=string }
+       ) }
+    
+    </insert>
+
+</mapper>
+
+
+
+
+
+
+
+
